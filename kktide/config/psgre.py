@@ -7,6 +7,6 @@ __all__ = [
 
 HOST = "127.0.0.1"
 PORT = 5432
-USER = "postgres"
-PASS = "postgres"
-DBNAME = "testdb"
+USER = "XXXX"
+PASS = "XXXX"
+DBNAME = "XXXX"
