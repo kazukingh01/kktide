@@ -22,5 +22,10 @@ sudo docker exec --user=postgres postgres psql -U postgres -d XXXXX -f /home/sha
 # Dump schema
 
 ```bash
-sudo docker exec --user=postgres postgres pg_dump -U postgres -d XXXXX -s > ~/schema.sql
+sudo docker exec --user=postgres postgres pg_dump -U postgres -d XXXXX -s \
+    -t tide_genbo \
+    -t tide_mst_genbo \
+    -t tide_suisan \
+    -t tide_mst_suisan \
+    > ~/schema.sql
 ```
