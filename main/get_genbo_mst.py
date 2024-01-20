@@ -25,7 +25,7 @@ if __name__ == "__main__":
             remarks = spwk.find_all("td")[0].text.strip()
         else:
             assert len(spwk.find_all("td")) == 11
-            se = pd.Series([x.text.strip() for x in spwk.find_all("td")], index=["place_no", "symbol", "name", "location", "longitude", "latitude", "method", "above_dl", "above_tp", "datum_line", "remarks"])
+            se = pd.Series([x.text.strip() for x in spwk.find_all("td")], index=["place_no", "symbol", "name", "location", "latitude", "longitude", "method", "above_dl", "above_tp", "datum_line", "remarks"])
             df.append(se)
     df = pd.concat(df, axis=1, ignore_index=False).T
 

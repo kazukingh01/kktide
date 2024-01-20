@@ -31,6 +31,7 @@ setup(
         'requests==2.28.2',
         'beautifulsoup4==4.11.2',
         'matplotlib==3.7.1',
+        'folium==0.15.1',
     ],
     python_requires='>=3.11.2'
 )

@@ -29,7 +29,7 @@ if __name__ == "__main__":
             se = pd.Series(
                 [x.text.strip() for x in spwk.find_all("td")],
                 index=[
-                    "place_no", "symbol", "name", "longitude", "latitude", "msl_above_st_min", "msl_above_tp", "st_min_above_tp", # st: spring tide 
+                    "place_no", "symbol", "name", "latitude", "longitude", "msl_above_st_min", "msl_above_tp", "st_min_above_tp", # st: spring tide 
                     "tide_m2_amp", "tide_m2_angle", "tide_s2_amp", "tide_s2_angle", "tide_k1_amp", "tide_k1_angle", "tide_o1_amp", "tide_o1_angle", 
                     "link", "remarks"
                 ]
