@@ -1,5 +1,6 @@
 import datetime, argparse, math
 from matplotlib import pyplot as plt
+from matplotlib import dates as mdates
 import pandas as pd
 import numpy as np
 from kkpsgre.psgre import Psgre
@@ -19,6 +20,7 @@ if __name__ == "__main__":
     parser.add_argument("--s",    type=str, help="--s MT,TA", default="")
     parser.add_argument("--genbo",  action='store_true', default=False)
     parser.add_argument("--suisan", action='store_true', default=False)
+    parser.add_argument("--showtime", action='store_true', default=False)
     args = parser.parse_args()
     assert args.genbo + args.suisan < 2
     db       = Psgre(f"host={HOST} port={PORT} dbname={DBNAME} user={USER} password={PASS}", max_disp_len=200)
@@ -67,10 +69,22 @@ if __name__ == "__main__":
             for (symbol, highlow), dfwk in df.groupby(["symbol", "highlow"]):
                 if args.genbo  and str_gs[0] == "s": continue
                 if args.suisan and str_gs[0] == "g": continue
-                if highlow == 0: ax[symbol].plot(   dfwk.loc[~dfwk[colname].isna(), "datetime"], dfwk.loc[~dfwk[colname].isna(), colname], color=colors[symbol], linestyle={"g_level": "--", "s_level": ":", "g_diff": "--", "s_diff": ":", "diff_g-s": "-"}[str_gs], label=f"{str_gs}: {symbol} {dict_mst_s[symbol]}")
-                if highlow == 1: ax[symbol].scatter(dfwk.loc[~dfwk[colname].isna(), "datetime"], dfwk.loc[~dfwk[colname].isna(), colname], color=colors[symbol], marker={"g_level": "*", "s_level": "^"}[str_gs])
-                if highlow == 2: ax[symbol].scatter(dfwk.loc[~dfwk[colname].isna(), "datetime"], dfwk.loc[~dfwk[colname].isna(), colname], color=colors[symbol], marker={"g_level": "o", "s_level": "v"}[str_gs])
-        for _, x in ax.items(): x.legend(prop=ipaexg_font)
+                if   highlow == 0: ax[symbol].plot(   dfwk.loc[~dfwk[colname].isna(), "datetime"], dfwk.loc[~dfwk[colname].isna(), colname], color=colors[symbol], linestyle={"g_level": "--", "s_level": ":", "g_diff": "--", "s_diff": ":", "diff_g-s": "-"}[str_gs], label=f"{str_gs}: {symbol} {dict_mst_s[symbol]}")
+                elif highlow == 1:
+                    dfwk = dfwk.loc[~dfwk[colname].isna(), :]
+                    ax[symbol].scatter(dfwk.loc[:, "datetime"], dfwk.loc[:, colname], color=colors[symbol], marker={"g_level": "*", "s_level": "^"}[str_gs])
+                    if args.showtime:
+                        corr = (ax[symbol].get_ylim()[-1] - ax[symbol].get_ylim()[0]) // 10
+                        for x, y in dfwk[["datetime", colname]].values:
+                            ax[symbol].text(mdates.date2num(x), y+corr, "\n".join(str(x).split(" ")), horizontalalignment="center")
+                elif highlow == 2:
+                    dfwk = dfwk.loc[~dfwk[colname].isna(), :]
+                    ax[symbol].scatter(dfwk.loc[:, "datetime"], dfwk.loc[:, colname], color=colors[symbol], marker={"g_level": "o", "s_level": "v"}[str_gs])
+                    if args.showtime:
+                        corr = (ax[symbol].get_ylim()[-1] - ax[symbol].get_ylim()[0]) // 10
+                        for x, y in dfwk[["datetime", colname]].values:
+                            ax[symbol].text(mdates.date2num(x), y-corr, "\n".join(str(x).split(" ")), horizontalalignment="center", verticalalignment="center")
+        for _, x in ax.items(): x.legend(prop=ipaexg_font, loc="lower right")
         fig.autofmt_xdate()
         fig.show()
         fig, ax = plt.subplots(1, 1, figsize=(15, 9))
@@ -78,9 +92,9 @@ if __name__ == "__main__":
             for (symbol, highlow), dfwk in df.groupby(["symbol", "highlow"]):
                 if args.genbo  and str_gs[0] == "s": continue
                 if args.suisan and str_gs[0] == "g": continue
-                if highlow == 0: ax.plot(   dfwk.loc[~dfwk[colname].isna(), "datetime"], dfwk.loc[~dfwk[colname].isna(), colname], color=colors[symbol], linestyle={"g_level": "--", "s_level": ":", "g_diff": "--", "s_diff": ":", "diff_g-s": "-"}[str_gs], label=f"{str_gs}: {symbol} {dict_mst_s[symbol]}")
-                if highlow == 1: ax.scatter(dfwk.loc[~dfwk[colname].isna(), "datetime"], dfwk.loc[~dfwk[colname].isna(), colname], color=colors[symbol], marker={"g_level": "*", "s_level": "^"}[str_gs])
-                if highlow == 2: ax.scatter(dfwk.loc[~dfwk[colname].isna(), "datetime"], dfwk.loc[~dfwk[colname].isna(), colname], color=colors[symbol], marker={"g_level": "o", "s_level": "v"}[str_gs])
+                if   highlow == 0: ax.plot(   dfwk.loc[~dfwk[colname].isna(), "datetime"], dfwk.loc[~dfwk[colname].isna(), colname], color=colors[symbol], linestyle={"g_level": "--", "s_level": ":", "g_diff": "--", "s_diff": ":", "diff_g-s": "-"}[str_gs], label=f"{str_gs}: {symbol} {dict_mst_s[symbol]}")
+                elif highlow == 1: ax.scatter(dfwk.loc[~dfwk[colname].isna(), "datetime"], dfwk.loc[~dfwk[colname].isna(), colname], color=colors[symbol], marker={"g_level": "*", "s_level": "^"}[str_gs])
+                elif highlow == 2: ax.scatter(dfwk.loc[~dfwk[colname].isna(), "datetime"], dfwk.loc[~dfwk[colname].isna(), colname], color=colors[symbol], marker={"g_level": "o", "s_level": "v"}[str_gs])
         ax.legend(prop=ipaexg_font)
         fig.autofmt_xdate()
         fig.show()
