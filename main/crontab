@@ -1,0 +1,3 @@
+0  23   1 *  *  ubuntu  /home/ubuntu/kktide/venv/bin/python /home/ubuntu/kktide/main/get_suisan.py --year `date "+\%Y"` --update
+0  23   29,30,31 12 *  ubuntu  /home/ubuntu/kktide/venv/bin/python /home/ubuntu/kktide/main/get_suisan.py --year `date "+\%Y" --date '1 year'` --update
+0  23   * *  *  ubuntu  /home/ubuntu/kktide/venv/bin/python /home/ubuntu/kktide/main/get_genbo.py --date `date "+\%Y\%m"` --since `date "+\%Y\%m" --date '1 month ago'` --update
