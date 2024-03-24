@@ -40,10 +40,10 @@ if __name__ == "__main__":
         except ValueError:
             symbols = args.s.split(",")
             for x in symbols: assert (x in list(dict_mst_g.keys()) or x in list(dict_mst_s.keys()))
-        assert len(args.fr) == 8
-        assert len(args.to) == 8
+        assert (len(args.fr) == 8)
+        assert (len(args.to) == 8)
         date_from = datetime.datetime.fromisoformat(args.fr)
-        date_to   = datetime.datetime.fromisoformat(args.to) + datetime.timedelta(days=1)
+        date_to   = datetime.datetime.fromisoformat(args.to)
         df_g      = db.select_sql(f"select * from tide_genbo  where symbol in ('" + "','".join(symbols) + f"') and datetime >= '{str(date_from)}' and datetime < '{str(date_to)}';")
         df_s      = db.select_sql(f"select * from tide_suisan where symbol in ('" + "','".join(symbols) + f"') and datetime >= '{str(date_from)}' and datetime < '{str(date_to)}';")
         df_g      = df_g.sort_values(["symbol", "datetime", "highlow"]).reset_index(drop=True)

@@ -25,13 +25,13 @@ setup(
         "Operating System :: OS Independent",
     ],
     install_requires=[
-        'kkpsgre @ git+https://github.com/kazukingh01/kkpsgre.git@9200e84429b12a11d6e897d8b478b7946075bf0e',
-        'pandas==1.5.3',
-        'numpy==1.24.2',
+        'kkpsgre @ git+https://github.com/kazukingh01/kkpsgre.git@7177981dbeb7fefcb8dc07ae368e780e60ddbd86',
+        'pandas==2.2.1',
+        'numpy==1.26.4',
         'requests==2.28.2',
-        'beautifulsoup4==4.11.2',
-        'matplotlib==3.7.1',
+        'beautifulsoup4==4.12.3',
+        'matplotlib==3.8.3',
         'folium==0.15.1',
     ],
-    python_requires='>=3.11.2'
+    python_requires='>=3.12.2'
 )
