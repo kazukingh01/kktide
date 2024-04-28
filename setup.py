@@ -10,7 +10,7 @@ with open("README.md", "r") as fh:
 
 setup(
     name='kktide',
-    version='1.0.0',
+    version='1.0.1',
     description="Collecting and analyze the TIDE's data",
     long_description=long_description,
     long_description_content_type="text/markdown",
@@ -25,7 +25,7 @@ setup(
         "Operating System :: OS Independent",
     ],
     install_requires=[
-        'kkpsgre @ git+https://github.com/kazukingh01/kkpsgre.git@7177981dbeb7fefcb8dc07ae368e780e60ddbd86',
+        'kkpsgre @ git+https://github.com/kazukingh01/kkpsgre.git@8ebc13408318c33c1bd7ae80e778c80ce67c9832',
         'pandas==2.2.1',
         'numpy==1.26.4',
         'requests==2.28.2',
