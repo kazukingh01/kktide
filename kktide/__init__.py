@@ -1,1 +1,1 @@
-from kktide import config
+from .util import com
