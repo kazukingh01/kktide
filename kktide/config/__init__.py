@@ -1,1 +1,0 @@
-from kktide.config import psgre
