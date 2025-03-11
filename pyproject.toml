@@ -1,0 +1,21 @@
+[project]
+name = "kktide"
+version = "1.1.0"
+requires-python = ">= 3.12.2"
+description = "Collecting and analyze the TIDE's data"
+dependencies = [
+    'kkpsgre @ git+https://github.com/kazukingh01/kkpsgre.git@08c8d1baabe101ba56054e6a2fd26fa6d0287d07',
+    'pandas==2.2.3',
+    'numpy==2.2.1',
+    'requests==2.32.3',
+    'beautifulsoup4==4.12.3',
+    'matplotlib==3.9.4',
+    'folium==0.19.5',
+]
+
+[build-system]
+requires = ["setuptools>=64.0.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = ["kktide", "kktide.util"]

@@ -1,12 +1,12 @@
 import datetime, argparse, math
 from matplotlib import pyplot as plt
 from matplotlib import dates as mdates
+from matplotlib.font_manager import FontProperties
 import pandas as pd
 import numpy as np
-from kkpsgre.psgre import Psgre
-from kktide.config.psgre import HOST, PORT, USER, PASS, DBNAME
-import matplotlib.pyplot as plt
-from matplotlib.font_manager import FontProperties
+from kkpsgre.connector import DBConnector
+from kktide.util.com import load_module_from_file
+
 
 font_path   = './ipaexg.ttf'
 ipaexg_font = FontProperties(fname=font_path)
@@ -14,6 +14,12 @@ ipaexg_font = FontProperties(fname=font_path)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
+    parser.add_argument("--host", type=str)
+    parser.add_argument("--port", type=int)
+    parser.add_argument("--user", type=str)
+    parser.add_argument("--pwd",  type=str)
+    parser.add_argument("--db",   type=str)
+    parser.add_argument("--load", type=str)    
     parser.add_argument("--fr",   type=str, help="--fr 20230101")
     parser.add_argument("--to",   type=str, help="--to 20230101")
     parser.add_argument("--list", action='store_true', default=False)
@@ -22,8 +28,30 @@ if __name__ == "__main__":
     parser.add_argument("--suisan", action='store_true', default=False)
     parser.add_argument("--showtime", action='store_true', default=False)
     args = parser.parse_args()
+    print(args)
+    if args.load is None:
+        assert args.host is not None
+        assert args.port is not None
+        assert args.user is not None
+        assert args.pwd  is not None
+        assert args.db   is not None
+    else:
+        assert args.host is None
+        assert args.port is None
+        assert args.user is None
+        assert args.pwd  is None
+        assert args.db   is None
+        spec = load_module_from_file(args.load)
+        if hasattr(spec, "CONNECTION_STRING"):
+            args.host = spec.CONNECTION_STRING
+        else:
+            args.host = spec.HOST
+            args.port = spec.PORT
+            args.user = spec.USER
+            args.pwd  = spec.PASS
+            args.db   = spec.DBNAME
     assert args.genbo + args.suisan < 2
-    db       = Psgre(f"host={HOST} port={PORT} dbname={DBNAME} user={USER} password={PASS}", max_disp_len=200)
+    db       = DBConnector(args.host, port=args.port, dbname=args.db, user=args.user, password=args.pwd, dbtype="psgre", max_disp_len=200)
     df_mst_g = db.select_sql("select * from tide_mst_genbo  where created_date = (select max(created_date) from tide_mst_genbo );")
     df_mst_s = db.select_sql("select * from tide_mst_suisan where created_date = (select max(created_date) from tide_mst_suisan);")
     dict_mst_g = {x: y for x, y in df_mst_g[["symbol", "name"]].values}

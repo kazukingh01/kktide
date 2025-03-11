@@ -1,14 +1,42 @@
 import argparse, folium
 import pandas as pd
-from kkpsgre.psgre import Psgre
-from kktide.config.psgre import HOST, PORT, USER, PASS, DBNAME
+from kkpsgre.connector import DBConnector
+from kktide.util.com import load_module_from_file
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--csv", type=str)
+    parser.add_argument("--host", type=str)
+    parser.add_argument("--port", type=int)
+    parser.add_argument("--user", type=str)
+    parser.add_argument("--pwd",  type=str)
+    parser.add_argument("--db",   type=str)
+    parser.add_argument("--load", type=str)    
+    parser.add_argument("--csv",  type=str)
     args = parser.parse_args()
-    db       = Psgre(f"host={HOST} port={PORT} dbname={DBNAME} user={USER} password={PASS}", max_disp_len=200)
+    print(args)
+    if args.load is None:
+        assert args.host is not None
+        assert args.port is not None
+        assert args.user is not None
+        assert args.pwd  is not None
+        assert args.db   is not None
+    else:
+        assert args.host is None
+        assert args.port is None
+        assert args.user is None
+        assert args.pwd  is None
+        assert args.db   is None
+        spec = load_module_from_file(args.load)
+        if hasattr(spec, "CONNECTION_STRING"):
+            args.host = spec.CONNECTION_STRING
+        else:
+            args.host = spec.HOST
+            args.port = spec.PORT
+            args.user = spec.USER
+            args.pwd  = spec.PASS
+            args.db   = spec.DBNAME
+    db       = DBConnector(args.host, port=args.port, dbname=args.db, user=args.user, password=args.pwd, dbtype="psgre", max_disp_len=200)
     df_mst_g = db.select_sql("select * from tide_mst_genbo  where created_date = (select max(created_date) from tide_mst_genbo );")
     df_mst_s = db.select_sql("select * from tide_mst_suisan where created_date = (select max(created_date) from tide_mst_suisan);")
 

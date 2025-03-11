@@ -1,1 +1,1 @@
-from .util import com
+from . import util

@@ -2,16 +2,54 @@ import datetime, argparse
 import requests
 import pandas as pd
 import numpy as np
-from kkpsgre.psgre import Psgre
-from kktide.config.psgre import HOST, PORT, USER, PASS, DBNAME
+from kkpsgre.connector import DBConnector
+from kktide.util.com import load_module_from_file
+from kklogger import set_logger
 
 
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--year",  type=str, help="--year  2023", required=True)
-    parser.add_argument("--since", type=str, help="--since 2001")
-    parser.add_argument("--update", action='store_true', default=False)
-    args = parser.parse_args()
+parser = argparse.ArgumentParser(
+    description="This command get data, connect to database and upload. [Suisan]",
+    epilog=r"""
+    [kktidesuisan --load ~/kktide/config/config.py --year 202301 --since 200101 --update]
+    """
+)
+parser.add_argument("--host", type=str)
+parser.add_argument("--port", type=int)
+parser.add_argument("--user", type=str)
+parser.add_argument("--pwd",  type=str)
+parser.add_argument("--db",   type=str)
+parser.add_argument("--load", type=str)
+parser.add_argument("--year",  type=str, help="--year  2023", required=True)
+parser.add_argument("--since", type=str, help="--since 200101")
+parser.add_argument("--update", action='store_true', default=False)
+parser.add_argument("--csv", type=str)
+args = parser.parse_args()
+LOGGER = set_logger(__name__)
+
+
+def suisan(args):
+    LOGGER.info(f"{args}")
+    if args.load is None:
+        assert args.host is not None
+        assert args.port is not None
+        assert args.user is not None
+        assert args.pwd  is not None
+        assert args.db   is not None
+    else:
+        assert args.host is None
+        assert args.port is None
+        assert args.user is None
+        assert args.pwd  is None
+        assert args.db   is None
+        spec = load_module_from_file(args.load)
+        if hasattr(spec, "CONNECTION_STRING"):
+            args.host = spec.CONNECTION_STRING
+        else:
+            args.host = spec.HOST
+            args.port = spec.PORT
+            args.user = spec.USER
+            args.pwd  = spec.PASS
+            args.db   = spec.DBNAME
     assert len(args.year) == 4
     if args.since is not None:
         assert len(args.since) == 4
@@ -22,7 +60,7 @@ if __name__ == "__main__":
         dates = [datetime.datetime(int(args.year[:4]), 1, 1), ]
 
     # get master
-    db     = Psgre(f"host={HOST} port={PORT} dbname={DBNAME} user={USER} password={PASS}", max_disp_len=200)
+    db     = DBConnector(args.host, port=args.port, dbname=args.db, user=args.user, password=args.pwd, dbtype="psgre", max_disp_len=200)
     df_mst = db.select_sql("select * from tide_mst_suisan where created_date = (select max(created_date) from tide_mst_suisan);")
 
     # Get data from TXT
@@ -73,10 +111,14 @@ if __name__ == "__main__":
             df["datetime"] = "20" + df["year"].astype(str).str.zfill(2) + df["month"].astype(str).str.zfill(2) + df["day"].astype(str).str.zfill(2) + df["hour"].astype(str).str.zfill(2) + df["minute"].astype(str).str.zfill(2) + "00"
             df["datetime"] = pd.to_datetime(df["datetime"])
             df["symbol"]   = symbol
-
             # to DB
             if args.update:
-                db = Psgre(f"host={HOST} port={PORT} dbname={DBNAME} user={USER} password={PASS}", max_disp_len=200)
                 db.set_sql(f"delete from tide_suisan where symbol = '{symbol}' and datetime >= '{str(df['datetime'].min())}' and datetime <= '{str(df['datetime'].max())}'")
                 db.insert_from_df(df[["datetime", "symbol", "highlow", "level"]], "tide_suisan", n_round=0, is_select=False, set_sql=True)
                 db.execute_sql()
+            if args.csv is not None:
+                df.to_csv(f"{args.csv}.{date.strftime('%Y%m')}.{symbol}.csv", index=False)
+
+
+if __name__ == "__main__":
+    suisan(args=args)

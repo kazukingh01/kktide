@@ -1,15 +1,46 @@
 import bs4, re, datetime, argparse
 import requests
 import pandas as pd
-from kkpsgre.psgre import Psgre
-from kktide.config.psgre import HOST, PORT, USER, PASS, DBNAME
+from kkpsgre.connector import DBConnector
+from kktide.util.com import load_module_from_file
+from kklogger import set_logger
 
 
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--update", action='store_true', default=False)
-    args = parser.parse_args()
+parser = argparse.ArgumentParser(
+    description="This command get data, connect to database and upload. [SuisanMst]",
+    epilog=r"""
+    [kktidesuisanmst --load ~/kktide/config/config.py --update]
+    """
+)
+parser.add_argument("--host", type=str)
+parser.add_argument("--port", type=int)
+parser.add_argument("--user", type=str)
+parser.add_argument("--pwd",  type=str)
+parser.add_argument("--db",   type=str)
+parser.add_argument("--load", type=str)
+parser.add_argument("--update", action='store_true', default=False)
+parser.add_argument("--csv", type=str)
+args = parser.parse_args()
+LOGGER = set_logger(__name__)
 
+
+def suisan_mst(args=args):
+    LOGGER.info(f"{args}")
+    if args.load is not None:
+        assert args.host is None
+        assert args.port is None
+        assert args.user is None
+        assert args.pwd  is None
+        assert args.db   is None
+        spec = load_module_from_file(args.load)
+        if hasattr(spec, "CONNECTION_STRING"):
+            args.host = spec.CONNECTION_STRING
+        else:
+            args.host = spec.HOST
+            args.port = spec.PORT
+            args.user = spec.USER
+            args.pwd  = spec.PASS
+            args.db   = spec.DBNAME
     # Get data from HTML
     res = requests.get('https://www.data.jma.go.jp/kaiyou/db/tide/suisan/station.php')
     res.encoding = 'utf-8'
@@ -36,7 +67,6 @@ if __name__ == "__main__":
             )
             df.append(se)
     df = pd.concat(df, axis=1, ignore_index=False).T
-
     # Organize the data
     ## see: https://www.data.jma.go.jp/kaiyou/db/tide/suisan/explanation.html#station
     df["created_date"]      = datetime.datetime.now().strftime("%Y%m%d")
@@ -55,7 +85,7 @@ if __name__ == "__main__":
     
     # to DB
     if args.update:
-        db = Psgre(f"host={HOST} port={PORT} dbname={DBNAME} user={USER} password={PASS}", max_disp_len=200)
+        db        = DBConnector(args.host, port=args.port, dbname=args.db, user=args.user, password=args.pwd, dbtype="psgre", max_disp_len=200)
         df_check  = db.select_sql("select * from tide_mst_suisan where created_date = (select max(created_date) from tide_mst_suisan);")
         columns   = df_check.columns[1:-1]
         is_insert = True
@@ -67,3 +97,10 @@ if __name__ == "__main__":
         if is_insert:
             db.insert_from_df(df, "tide_mst_suisan", n_round=2, is_select=True)
             db.execute_sql()
+    if args.csv is not None:
+        df.to_csv(args.csv, index=False)
+    return df
+
+
+if __name__ == "__main__":
+    df = suisan_mst(args=args)
