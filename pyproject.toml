@@ -19,7 +19,9 @@ build-backend = "setuptools.build_meta"
 
 [tool.setuptools]
 packages = ["kktide", "kktide.util", "kktide.config"]
-include_package_data = true
+
+[tool.setuptools.package-data]
+kktide = ["config/schema.sql"]
 
 [project.scripts]
 kktidegenbo     = "kktide.bin.get_genbo:genbo"
