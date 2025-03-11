@@ -19,3 +19,9 @@ build-backend = "setuptools.build_meta"
 
 [tool.setuptools]
 packages = ["kktide", "kktide.util"]
+
+[project.scripts]
+kktidegenbo     = "kktide.bin.get_genbo:genbo"
+kktidegenbomst  = "kktide.bin.get_genbo_mst:genbo_mst"
+kktidesuisan    = "kktide.bin.get_suisan:suisan"
+kktidesuisanmst = "kktide.bin.get_suisan_mst:suisan_mst"
