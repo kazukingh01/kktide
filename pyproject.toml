@@ -1,6 +1,6 @@
 [project]
 name = "kktide"
-version = "1.1.0"
+version = "1.1.1"
 requires-python = ">= 3.12.2"
 description = "Collecting and analyze the TIDE's data"
 dependencies = [

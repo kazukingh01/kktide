@@ -10,7 +10,8 @@ from kklogger import set_logger
 parser = argparse.ArgumentParser(
     description="This command get data, connect to database and upload. [Genbo]",
     epilog=r"""
-    [kktidegenbo --load ~/kktide/config/config.py --date 202301 --since 200101 --update]
+    [kktidegenbo --date 202301 --since 200101 --update --load ~/kktide/config/config.py]
+    [kktidegenbo --date 202301 --since 200101 --update  --host 172.17.0.2 --port 5432 --user postgres --pwd postgres --db tide]
     """
 )
 parser.add_argument("--host", type=str)

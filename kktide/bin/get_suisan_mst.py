@@ -9,7 +9,8 @@ from kklogger import set_logger
 parser = argparse.ArgumentParser(
     description="This command get data, connect to database and upload. [SuisanMst]",
     epilog=r"""
-    [kktidesuisanmst --load ~/kktide/config/config.py --update]
+    [kktidesuisanmst --update --load ~/kktide/config/config.py]
+    [kktidesuisanmst --update --host 172.17.0.2 --port 5432 --user postgres --pwd postgres --db tide]
     """
 )
 parser.add_argument("--host", type=str)
@@ -90,13 +91,20 @@ def suisan_mst(args=args):
         columns   = df_check.columns[1:-1]
         is_insert = True
         if df_check.shape[0] == df.shape[0]:
-            ndf_check = df_check.loc[:, columns].values == df.loc[:, columns].values
-            ndf_check[df.loc[:, columns].isna().values] = True
-            if ndf_check.sum() == (ndf_check.shape[0] * ndf_check.shape[1]):
+            dfwk1 = df.      loc[:, columns].set_index("symbol").copy()
+            dfwk2 = df_check.loc[:, columns].set_index("symbol").copy()
+            dfwk1 = dfwk1.loc[dfwk2.index].replace(float("nan"), None)
+            dfwk2 = dfwk2.replace(float("nan"), None)
+            if (dfwk1.to_numpy(dtype=object) != dfwk2.to_numpy(dtype=object)).sum() == 0:
                 is_insert = False
+            else:
+                is_insert = True
+                assert df["created_date"].max() > df_check["created_date"].max()
         if is_insert:
             db.insert_from_df(df, "tide_mst_suisan", n_round=2, is_select=True)
             db.execute_sql()
+        else:
+            LOGGER.warning("All data is already in the database.")
     if args.csv is not None:
         df.to_csv(args.csv, index=False)
     return df

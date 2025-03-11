@@ -10,7 +10,8 @@ from kklogger import set_logger
 parser = argparse.ArgumentParser(
     description="This command get data, connect to database and upload. [Suisan]",
     epilog=r"""
-    [kktidesuisan --load ~/kktide/config/config.py --year 202301 --since 200101 --update]
+    [kktidesuisan --year 2023 --since 2001 --update --load ~/kktide/config/config.py ]
+    [kktidesuisan --year 2023 --since 2001 --update --host 172.17.0.2 --port 5432 --user postgres --pwd postgres --db tide]
     """
 )
 parser.add_argument("--host", type=str)
@@ -20,14 +21,14 @@ parser.add_argument("--pwd",  type=str)
 parser.add_argument("--db",   type=str)
 parser.add_argument("--load", type=str)
 parser.add_argument("--year",  type=str, help="--year  2023", required=True)
-parser.add_argument("--since", type=str, help="--since 200101")
+parser.add_argument("--since", type=str, help="--since 2001")
 parser.add_argument("--update", action='store_true', default=False)
 parser.add_argument("--csv", type=str)
 args = parser.parse_args()
 LOGGER = set_logger(__name__)
 
 
-def suisan(args):
+def suisan(args=args):
     LOGGER.info(f"{args}")
     if args.load is None:
         assert args.host is not None
