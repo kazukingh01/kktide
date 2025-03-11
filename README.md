@@ -1,4 +1,5 @@
 # kktide
+
 Collecting and analyze the TIDE's data
 
 This data is collected via below public website.
@@ -35,9 +36,7 @@ sudo docker exec --user=postgres postgres createdb --encoding=UTF8 --locale=ja_J
 # Import schema
 
 ```bash
-cd ~
-git clone https://github.com/kazukingh01/kktide.git
-cp ~/kktide/main/schema.sql /home/share/
+cp $(dirname "$(which kktidegenbo)")/../lib/$(python -c "import sys; print(f'python{sys.version_info.major}.{sys.version_info.minor}')")/site-packages/kktide/config/schema.sql /home/share/
 sudo docker exec --user=postgres postgres psql -U postgres -d XXXXX -f /home/share/schema.sql 
 ```
 
@@ -71,7 +70,7 @@ python get_suisan.py --year 2024                  --update --host 172.17.0.2 --p
 ### Plot
 
 ```bash
-python plot.py --list
-python -i plot.py --fr 20240301 --to 20240305 --suisan --s ZL --showtime
-python show_map.py --csv XXXXX.csv
+python    plot.py     --load ~/config/connection.py --list
+python -i plot.py     --load ~/config/connection.py --fr 20240301 --to 20240305 --suisan --s ZL --showtime
+python    show_map.py --load ~/config/connection.py --csv XXXXX.csv
 ```
