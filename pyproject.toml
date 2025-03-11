@@ -18,7 +18,7 @@ requires = ["setuptools>=64.0.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools]
-packages = ["kktide", "kktide.util"]
+packages = ["kktide", "kktide.util", "kktide.config"]
 
 [project.scripts]
 kktidegenbo     = "kktide.bin.get_genbo:genbo"
