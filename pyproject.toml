@@ -1,6 +1,6 @@
 [project]
 name = "kktide"
-version = "1.1.2"
+version = "1.1.3"
 requires-python = ">= 3.12.2"
 description = "Collecting and analyze the TIDE's data"
 dependencies = [
@@ -21,7 +21,7 @@ build-backend = "setuptools.build_meta"
 packages = ["kktide", "kktide.bin", "kktide.util", "kktide.config"]
 
 [tool.setuptools.package-data]
-kktide = ["config/schema.sql"]
+kktide = ["config/schema.sql", "config/ipaexg.ttf"]
 
 [project.scripts]
 kktidegenbo     = "kktide.bin.get_genbo:genbo"

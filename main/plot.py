@@ -1,4 +1,5 @@
 import datetime, argparse, math
+import importlib.resources as ir
 from matplotlib import pyplot as plt
 from matplotlib import dates as mdates
 from matplotlib.font_manager import FontProperties
@@ -8,7 +9,7 @@ from kkpsgre.connector import DBConnector
 from kktide.util.com import load_module_from_file
 
 
-font_path   = './ipaexg.ttf'
+font_path   = str(ir.as_file(ir.files("kktide.config").joinpath("ipaexg.ttf")).args[0].absolute())
 ipaexg_font = FontProperties(fname=font_path)
 
 
