@@ -1,10 +1,10 @@
 [project]
 name = "kktide"
-version = "1.1.3"
+version = "1.1.4"
 requires-python = ">= 3.12.2"
 description = "Collecting and analyze the TIDE's data"
 dependencies = [
-    'kkpsgre @ git+https://github.com/kazukingh01/kkpsgre.git@08c8d1baabe101ba56054e6a2fd26fa6d0287d07',
+    'kkpsgre @ git+https://github.com/kazukingh01/kkpsgre.git@e19504564aab73e61450dcfc4f3d79b40f00235d',
     'pandas==2.2.3',
     'numpy==2.2.1',
     'requests==2.32.3',
